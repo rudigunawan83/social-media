@@ -1,0 +1,79 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { User } from "@/types/models";
+
+interface AuthState {
+  token: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+const initialState: AuthState = {
+  token: null,
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+};
+
+export const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    setCredentials: (
+      state,
+      action: PayloadAction<{ token: string; user?: User }>
+    ) => {
+      state.token = action.payload.token;
+      if (action.payload.user) {
+        state.user = action.payload.user;
+      }
+      state.isAuthenticated = true;
+      state.isLoading = false;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sociality_token", action.payload.token);
+        if (action.payload.user) {
+          localStorage.setItem("sociality_user", JSON.stringify(action.payload.user));
+        }
+      }
+    },
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+      state.isLoading = false;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("sociality_user", JSON.stringify(action.payload));
+      }
+    },
+    logout: (state) => {
+      state.token = null;
+      state.user = null;
+      state.isAuthenticated = false;
+      state.isLoading = false;
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("sociality_token");
+        localStorage.removeItem("sociality_user");
+      }
+    },
+    initializeAuth: (state) => {
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("sociality_token");
+        const userStr = localStorage.getItem("sociality_user");
+        if (token) {
+          state.token = token;
+          state.isAuthenticated = true;
+          if (userStr) {
+            try {
+              state.user = JSON.parse(userStr);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      }
+      state.isLoading = false;
+    },
+  },
+});
+
+export const { setCredentials, setUser, logout, initializeAuth } = authSlice.actions;
+export default authSlice.reducer;
