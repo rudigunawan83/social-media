@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Compass, PlusCircle } from "lucide-react";
@@ -13,16 +13,18 @@ import { postsApi } from "@/features/posts/api/posts";
 import { queryKeys } from "@/lib/query-keys";
 import { useAppSelector } from "@/store";
 import { setCreatePostModalOpen } from "@/store/uiSlice";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 import { Post } from "@/types/models";
 
 export default function FeedPage() {
   const dispatch = useDispatch();
+  const mounted = useHasMounted();
   const { isAuthenticated, isLoading: authLoading } = useAppSelector((s) => s.auth);
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState<Post[]>([]);
 
-  // Sebelum login: /api/posts (explore publik)
-  // Sesudah login: /api/feed (timeline pribadi)
+  const ready = mounted && !authLoading;
+
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: isAuthenticated
       ? queryKeys.feed.list(page)
@@ -38,18 +40,18 @@ export default function FeedPage() {
       });
       return result;
     },
-    enabled: !authLoading,
+    enabled: ready,
   });
 
-  // Reset list saat status auth berubah
-  React.useEffect(() => {
+  useEffect(() => {
     setPage(1);
     setPosts([]);
   }, [isAuthenticated]);
 
   const list = posts.length > 0 ? posts : data?.items || [];
 
-  if (authLoading) {
+  // Server + first client paint: shell sama → cegah hydration mismatch
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
         <LoadingSpinner />
@@ -59,7 +61,6 @@ export default function FeedPage() {
 
   return (
     <TimelineLayout>
-      {/* Judul Timeline hanya desktop — mobile Figma langsung feed */}
       <div className="mb-4 hidden border-b border-white/10 pb-3 md:block">
         <h1 className="text-base font-semibold tracking-wide text-white">Timeline</h1>
       </div>

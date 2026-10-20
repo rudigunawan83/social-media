@@ -37,11 +37,17 @@ export const authSlice = createSlice({
       }
     },
     setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+      const next = action.payload;
+      // Jangan timpa user valid dengan payload kosong dari API
+      const nextOk = Boolean(next?.id && (next.username || next.name));
+      const prevOk = Boolean(state.user?.id && (state.user.username || state.user.name));
+      if (!nextOk && prevOk) return;
+
+      state.user = nextOk ? next : state.user;
       state.isAuthenticated = true;
       state.isLoading = false;
-      if (typeof window !== "undefined") {
-        localStorage.setItem("sociality_user", JSON.stringify(action.payload));
+      if (typeof window !== "undefined" && nextOk) {
+        localStorage.setItem("sociality_user", JSON.stringify(next));
       }
     },
     logout: (state) => {

@@ -16,10 +16,22 @@ export const usersApi = {
 
   updateMyProfile: async (payload: FormData | Record<string, unknown>): Promise<User> => {
     const isFormData = typeof FormData !== "undefined" && payload instanceof FormData;
-    const { data } = await apiClient.patch("/api/me", payload, {
-      headers: isFormData ? { "Content-Type": "multipart/form-data" } : undefined,
+    // Jangan set Content-Type manual — biar browser/axios menambah boundary multipart
+    await apiClient.patch("/api/me", payload, {
+      headers: isFormData ? { "Content-Type": undefined as unknown as string } : undefined,
+      transformRequest: isFormData
+        ? [
+            (data, headers) => {
+              if (headers && typeof headers === "object") {
+                delete (headers as Record<string, unknown>)["Content-Type"];
+              }
+              return data;
+            },
+          ]
+        : undefined,
     });
-    return normalizeUser(unwrapData(data));
+    // PATCH kadang tidak mengembalikan user lengkap — ambil ulang dari GET /api/me
+    return usersApi.getMyProfile();
   },
 
   getMyPosts: async (page = 1, limit = 20): Promise<PaginatedResult<Post>> => {

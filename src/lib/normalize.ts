@@ -55,32 +55,84 @@ export function extractList<T>(
   return { items, ...meta };
 }
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://be-social-media-api-production.up.railway.app";
+
+/** Ubah path relatif avatar BE jadi URL absolut yang bisa di-load <img> */
+export function resolveMediaUrl(value?: string | null): string | null {
+  if (!value || typeof value !== "string") return null;
+  const url = value.trim();
+  if (!url || url === "null" || url === "undefined") return null;
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("blob:") ||
+    url.startsWith("data:")
+  ) {
+    return url;
+  }
+  if (url.startsWith("//")) return `https:${url}`;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${API_BASE.replace(/\/$/, "")}${path}`;
+}
+
+function pickAvatar(raw: any): string | null {
+  const candidates = [
+    raw?.avatarUrl,
+    raw?.avatar_url,
+    raw?.avatar,
+    raw?.profilePicture,
+    raw?.profile_picture,
+    raw?.photoUrl,
+    raw?.imageUrl,
+    typeof raw?.avatar === "object" ? raw.avatar?.url : null,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.trim()) return resolveMediaUrl(c);
+  }
+  return null;
+}
+
+/** Cek apakah objek punya field identitas user yang valid */
+export function isValidUser(user?: User | null): user is User {
+  return Boolean(user && user.id && (user.username || user.name));
+}
+
 export function normalizeUser(raw: any): User {
   if (!raw || typeof raw !== "object") {
     return { id: 0, name: "", username: "" };
   }
 
-  const counts = raw.counts || {};
+  // Kadang payload nested: { user|profile|me: {...} }
+  const nested =
+    (raw.user && typeof raw.user === "object" && raw.user) ||
+    (raw.profile && typeof raw.profile === "object" && raw.profile) ||
+    (raw.me && typeof raw.me === "object" && raw.me) ||
+    null;
+  const source = nested || raw;
+  const counts = source.counts || raw.counts || {};
+
   return {
-    id: Number(raw.id),
-    name: raw.name ?? raw.username ?? "",
-    username: raw.username ?? "",
-    email: raw.email,
-    phone: raw.phone ?? null,
-    bio: raw.bio ?? null,
-    avatarUrl: raw.avatarUrl ?? raw.avatar ?? null,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt,
-    postsCount: Number(raw.postsCount ?? counts.post ?? counts.posts ?? 0),
-    followersCount: Number(raw.followersCount ?? counts.followers ?? 0),
-    followingCount: Number(raw.followingCount ?? counts.following ?? 0),
-    likesCount: Number(raw.likesCount ?? counts.likes ?? 0),
-    savedCount: Number(raw.savedCount ?? counts.saved ?? 0),
+    id: Number(source.id ?? raw.id ?? 0),
+    name: String(source.name ?? source.fullName ?? source.displayName ?? source.username ?? ""),
+    username: String(source.username ?? ""),
+    email: source.email,
+    phone: source.phone ?? source.phoneNumber ?? null,
+    bio: source.bio ?? source.about ?? null,
+    avatarUrl: pickAvatar(source) ?? pickAvatar(raw),
+    createdAt: source.createdAt,
+    updatedAt: source.updatedAt,
+    postsCount: Number(source.postsCount ?? counts.post ?? counts.posts ?? 0),
+    followersCount: Number(source.followersCount ?? counts.followers ?? 0),
+    followingCount: Number(source.followingCount ?? counts.following ?? 0),
+    likesCount: Number(source.likesCount ?? counts.likes ?? 0),
+    savedCount: Number(source.savedCount ?? counts.saved ?? 0),
     isFollowedByMe: Boolean(
-      raw.isFollowedByMe ?? raw.isFollowing ?? raw.followedByMe ?? false
+      source.isFollowedByMe ?? source.isFollowing ?? source.followedByMe ?? false
     ),
-    isMe: Boolean(raw.isMe),
-    followsMe: Boolean(raw.followsMe),
+    isMe: Boolean(source.isMe ?? raw.isMe),
+    followsMe: Boolean(source.followsMe),
   };
 }
 

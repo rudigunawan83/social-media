@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/normalize";
 
 interface AvatarProps {
   src?: string | null;
@@ -18,36 +19,25 @@ const sizeClasses = {
   xl: "w-20 h-20 text-xl",
 };
 
-function isUsableImageSrc(src?: string | null): src is string {
-  if (!src || typeof src !== "string") return false;
-  const value = src.trim();
-  if (!value) return false;
-  return (
-    value.startsWith("http://") ||
-    value.startsWith("https://") ||
-    value.startsWith("blob:") ||
-    value.startsWith("data:") ||
-    value.startsWith("/")
-  );
-}
-
 export function Avatar({ src, alt = "Avatar", name = "", size = "md", className }: AvatarProps) {
   const [imageError, setImageError] = React.useState(false);
+  const resolvedSrc = React.useMemo(() => resolveMediaUrl(src), [src]);
 
   React.useEffect(() => {
     setImageError(false);
-  }, [src]);
+  }, [resolvedSrc]);
 
   const initials = name
     ? name
         .split(" ")
         .map((n) => n[0])
+        .filter(Boolean)
         .slice(0, 2)
         .join("")
         .toUpperCase()
     : "U";
 
-  const showFallback = !isUsableImageSrc(src) || imageError;
+  const showFallback = !resolvedSrc || imageError;
 
   return (
     <div
@@ -58,16 +48,17 @@ export function Avatar({ src, alt = "Avatar", name = "", size = "md", className 
       )}
     >
       {!showFallback ? (
-        // Native img: avatar URL dari BE/Cloudinary sering dinamis & tidak selalu cocok next/image optimizer
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={src}
-          alt={alt}
+          key={resolvedSrc}
+          src={resolvedSrc}
+          alt={alt || name || "Avatar"}
           className="absolute inset-0 h-full w-full object-cover"
+          referrerPolicy="no-referrer"
           onError={() => setImageError(true)}
         />
       ) : (
-        <span>{initials}</span>
+        <span aria-hidden>{initials}</span>
       )}
     </div>
   );

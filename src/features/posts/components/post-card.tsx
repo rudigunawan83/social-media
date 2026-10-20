@@ -12,7 +12,8 @@ import { SaveButton } from "@/features/bookmarks/components/save-button";
 import { postsApi } from "../api/posts";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setLikedByPostId } from "@/store/uiSlice";
-import { formatRelativeTime, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { RelativeTime } from "@/components/common/relative-time";
 import { queryKeys } from "@/lib/query-keys";
 
 export function PostCard({ post }: { post: Post }) {
@@ -70,7 +71,7 @@ export function PostCard({ post }: { post: Post }) {
               {post.author?.username || post.author?.name || "Unknown"}
             </Link>
             <p className="text-[11px] capitalize text-neutral-500">
-              {formatRelativeTime(post.createdAt)}
+              <RelativeTime date={post.createdAt} />
             </p>
           </div>
         </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Grid, Bookmark, Heart, Edit3, Settings } from "lucide-react";
-import { MainLayout } from "@/components/layout/main-layout";
+import { TimelineLayout } from "@/components/layout/timeline-layout";
 import { Avatar } from "@/components/common/avatar";
 import { PostGrid } from "@/features/posts/components/post-grid";
 import { PostCard } from "@/features/posts/components/post-card";
@@ -16,12 +16,15 @@ import { bookmarksApi } from "@/features/bookmarks/api/bookmarks";
 import { queryKeys } from "@/lib/query-keys";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setEditProfileModalOpen } from "@/store/uiSlice";
+import { setUser } from "@/store/authSlice";
 import { cn } from "@/lib/utils";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 
 function MyProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
+  const mounted = useHasMounted();
   const { isAuthenticated, user: cachedUser, isLoading: authLoading } = useAppSelector(
     (s) => s.auth
   );
@@ -46,6 +49,13 @@ function MyProfileContent() {
     enabled: isAuthenticated,
   });
 
+  // Sinkronkan profil terbaru (termasuk avatarUrl) ke Redux + localStorage
+  useEffect(() => {
+    if (profile?.id) {
+      dispatch(setUser(profile));
+    }
+  }, [profile, dispatch]);
+
   const user = profile || cachedUser;
 
   const { data: myPostsData, isLoading: postsLoading } = useQuery({
@@ -66,7 +76,11 @@ function MyProfileContent() {
     enabled: isAuthenticated && activeTab === "likes",
   });
 
-  if (!isAuthenticated && !authLoading) return null;
+  if (!mounted || authLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) return null;
 
   const setTab = (tab: string) => {
     setActiveTab(tab);
@@ -231,10 +245,10 @@ function MyProfileContent() {
 
 export default function MyProfilePage() {
   return (
-    <MainLayout>
+    <TimelineLayout>
       <Suspense fallback={<LoadingSpinner />}>
         <MyProfileContent />
       </Suspense>
-    </MainLayout>
+    </TimelineLayout>
   );
 }

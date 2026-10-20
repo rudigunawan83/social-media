@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { commentsApi } from "../api/comments";
 import { queryKeys } from "@/lib/query-keys";
 import { Avatar } from "@/components/common/avatar";
-import { formatRelativeTime } from "@/lib/utils";
+import { RelativeTime } from "@/components/common/relative-time";
 import { useAppSelector } from "@/store";
 import { LoadingSpinner, EmptyState } from "@/components/common/state-views";
 import { LoadMoreButton } from "@/components/common/load-more-button";
@@ -139,9 +139,9 @@ export function CommentBox({ postId, postAuthorId }: CommentBoxProps) {
                     >
                       {comment.author?.name || comment.author?.username || "User"}
                     </Link>
-                    <span className="text-[10px] text-neutral-500">
-                      {formatRelativeTime(comment.createdAt)}
-                    </span>
+                      <span className="text-[10px] text-neutral-500">
+                        <RelativeTime date={comment.createdAt} />
+                      </span>
                   </div>
                   <p className="mt-1 break-words text-xs leading-relaxed text-neutral-300">
                     {comment.text}

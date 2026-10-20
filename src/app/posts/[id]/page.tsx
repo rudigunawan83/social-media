@@ -15,7 +15,7 @@ import { CommentBox } from "@/features/comments/components/comment-box";
 import { LoadingSpinner, ErrorState } from "@/components/common/state-views";
 import { postsApi } from "@/features/posts/api/posts";
 import { queryKeys } from "@/lib/query-keys";
-import { formatRelativeTime } from "@/lib/utils";
+import { RelativeTime } from "@/components/common/relative-time";
 import { useAppSelector } from "@/store";
 
 export default function PostDetailPage({
@@ -103,7 +103,7 @@ export default function PostDetailPage({
                     {post.author?.name || post.author?.username}
                   </Link>
                   <p className="text-xs text-neutral-500">
-                    @{post.author?.username} · {formatRelativeTime(post.createdAt)}
+                    @{post.author?.username} · <RelativeTime date={post.createdAt} />
                   </p>
                 </div>
               </div>
