@@ -5,15 +5,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, MessageCircle } from "lucide-react";
 import { Post } from "@/types/models";
+import { cn } from "@/lib/utils";
 
-export function PostGrid({ posts }: { posts: Post[] }) {
+export function PostGrid({ posts, tight = false }: { posts: Post[]; tight?: boolean }) {
   return (
-    <div className="grid grid-cols-3 gap-1 sm:gap-2">
+    <div className={cn("grid grid-cols-3", tight ? "gap-[2px]" : "gap-1 sm:gap-2")}>
       {posts.map((post) => (
         <Link
           key={post.id}
           href={`/posts/${post.id}`}
-          className="group relative aspect-square overflow-hidden bg-[#111] rounded-sm sm:rounded-lg"
+          className={cn(
+            "group relative aspect-square overflow-hidden bg-[#111]",
+            tight ? "rounded-none" : "rounded-sm sm:rounded-lg"
+          )}
         >
           {post.imageUrl ? (
             <Image

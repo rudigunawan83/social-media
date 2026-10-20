@@ -111,7 +111,24 @@ export function normalizeUser(raw: any): User {
     (raw.me && typeof raw.me === "object" && raw.me) ||
     null;
   const source = nested || raw;
-  const counts = source.counts || raw.counts || {};
+  // BE: counts | stats | quickStats — field post/posts/likes bervariasi
+  const counts =
+    source.counts ||
+    raw.counts ||
+    source.stats ||
+    raw.stats ||
+    source.quickStats ||
+    raw.quickStats ||
+    {};
+
+  const pickNum = (...vals: unknown[]) => {
+    for (const v of vals) {
+      if (v == null || v === "") continue;
+      const n = Number(v);
+      if (!Number.isNaN(n)) return n;
+    }
+    return 0;
+  };
 
   return {
     id: Number(source.id ?? raw.id ?? 0),
@@ -123,11 +140,37 @@ export function normalizeUser(raw: any): User {
     avatarUrl: pickAvatar(source) ?? pickAvatar(raw),
     createdAt: source.createdAt,
     updatedAt: source.updatedAt,
-    postsCount: Number(source.postsCount ?? counts.post ?? counts.posts ?? 0),
-    followersCount: Number(source.followersCount ?? counts.followers ?? 0),
-    followingCount: Number(source.followingCount ?? counts.following ?? 0),
-    likesCount: Number(source.likesCount ?? counts.likes ?? 0),
-    savedCount: Number(source.savedCount ?? counts.saved ?? 0),
+    postsCount: pickNum(
+      source.postsCount,
+      source.postCount,
+      counts.post,
+      counts.posts,
+      counts.postCount,
+      raw.postsCount,
+      raw.postCount
+    ),
+    followersCount: pickNum(
+      source.followersCount,
+      counts.followers,
+      counts.follower,
+      raw.followersCount
+    ),
+    followingCount: pickNum(
+      source.followingCount,
+      counts.following,
+      counts.followings,
+      raw.followingCount
+    ),
+    likesCount: pickNum(
+      source.likesCount,
+      source.likeCount,
+      counts.likes,
+      counts.like,
+      counts.likeCount,
+      raw.likesCount,
+      raw.likeCount
+    ),
+    savedCount: pickNum(source.savedCount, counts.saved, counts.saves, raw.savedCount),
     isFollowedByMe: Boolean(
       source.isFollowedByMe ?? source.isFollowing ?? source.followedByMe ?? false
     ),

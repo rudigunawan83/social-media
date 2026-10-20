@@ -9,6 +9,7 @@ export const queryKeys = {
   posts: {
     all: ["posts"] as const,
     explore: (page?: number) => ["posts", "explore", page] as const,
+    search: (query: string, page?: number) => ["posts", "search", query, page] as const,
     detail: (id: number) => ["posts", "detail", id] as const,
     comments: (id: number, page?: number) => ["posts", "comments", id, page] as const,
     likes: (id: number, page?: number) => ["posts", "likes", id, page] as const,

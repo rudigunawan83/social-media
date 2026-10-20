@@ -3,7 +3,7 @@
 import React, { use } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { MainLayout } from "@/components/layout/main-layout";
+import { TimelineLayout } from "@/components/layout/timeline-layout";
 import { FollowList } from "@/features/follow/components/follow-list";
 import { followApi } from "@/features/follow/api/follow";
 import { queryKeys } from "@/lib/query-keys";
@@ -17,8 +17,8 @@ export default function UserFollowersPage({
   const username = decodeURIComponent(raw);
 
   return (
-    <MainLayout>
-      <div className="mb-5 flex items-center gap-3">
+    <TimelineLayout>
+      <div className="mb-5 flex items-center gap-3 px-4 md:px-0">
         <Link
           href={`/profile/${username}`}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-white"
@@ -34,6 +34,6 @@ export default function UserFollowersPage({
         emptyTitle="Belum ada followers"
         emptyDescription={`@${username} belum memiliki followers.`}
       />
-    </MainLayout>
+    </TimelineLayout>
   );
 }

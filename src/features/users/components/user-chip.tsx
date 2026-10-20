@@ -10,22 +10,31 @@ import { cn } from "@/lib/utils";
 interface UserChipProps {
   user: User;
   showFollowButton?: boolean;
+  /** Figma Likes modal: username tanpa prefix @ */
+  hideAtPrefix?: boolean;
   className?: string;
 }
 
-export function UserChip({ user, showFollowButton = true, className }: UserChipProps) {
+export function UserChip({
+  user,
+  showFollowButton = true,
+  hideAtPrefix = false,
+  className,
+}: UserChipProps) {
   return (
-    <div className={cn("flex items-center justify-between gap-3 group", className)}>
+    <div className={cn("group flex items-center justify-between gap-3", className)}>
       <Link
         href={`/profile/${user.username}`}
-        className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+        className="flex min-w-0 flex-1 items-center gap-3 transition-opacity hover:opacity-90"
       >
         <Avatar src={user.avatarUrl} name={user.name || user.username} size="md" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-neutral-100 truncate group-hover:text-neutral-300 transition-colors">
+          <p className="truncate text-sm font-semibold text-white transition-colors group-hover:text-neutral-200">
             {user.name || user.username}
           </p>
-          <p className="text-xs text-neutral-400 truncate">@{user.username}</p>
+          <p className="truncate text-xs text-neutral-400">
+            {hideAtPrefix ? user.username : `@${user.username}`}
+          </p>
         </div>
       </Link>
       {showFollowButton && (

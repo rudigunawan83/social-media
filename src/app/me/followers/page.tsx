@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { MainLayout } from "@/components/layout/main-layout";
+import { TimelineLayout } from "@/components/layout/timeline-layout";
 import { FollowList } from "@/features/follow/components/follow-list";
 import { followApi } from "@/features/follow/api/follow";
 import { queryKeys } from "@/lib/query-keys";
@@ -23,8 +23,8 @@ export default function MyFollowersPage() {
   if (!isAuthenticated && !isLoading) return null;
 
   return (
-    <MainLayout>
-      <div className="mb-5 flex items-center gap-3">
+    <TimelineLayout>
+      <div className="mb-5 flex items-center gap-3 px-4 md:px-0">
         <Link
           href="/me"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-400 hover:text-white"
@@ -40,6 +40,6 @@ export default function MyFollowersPage() {
         emptyTitle="Belum ada followers"
         emptyDescription="Saat orang mengikuti Anda, mereka akan muncul di sini."
       />
-    </MainLayout>
+    </TimelineLayout>
   );
 }

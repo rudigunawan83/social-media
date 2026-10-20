@@ -75,13 +75,13 @@ export function FollowButton({
       onMouseLeave={() => setIsHovered(false)}
       disabled={mutation.isPending}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg font-semibold transition-all disabled:opacity-50",
-        isSmall ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm",
+        "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-full font-semibold transition-all disabled:opacity-50",
+        isSmall ? "px-3.5 py-1.5 text-xs" : "min-w-[96px] px-5 py-2 text-sm",
         isFollowing
           ? isHovered
             ? "border border-red-500/50 bg-red-500/15 text-red-300"
-            : "border border-white/20 bg-transparent text-white"
-          : "bg-violet-600 text-white hover:bg-violet-500 active:scale-95",
+            : "border border-white/25 bg-transparent text-white"
+          : "border border-transparent bg-violet-600 text-white shadow-md shadow-violet-600/25 hover:bg-violet-500 active:scale-95",
         className
       )}
     >

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, LogOut, Menu, X } from "lucide-react";
 import { Avatar } from "@/components/common/avatar";
 import { SocialityLogo } from "@/components/common/sociality-logo";
+import { HeaderSearch } from "@/features/search/components/header-search";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { logout } from "@/store/authSlice";
 
@@ -14,20 +15,10 @@ export function TimelineHeader() {
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((s) => s.auth);
-  const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const returnTo = encodeURIComponent(pathname || "/feed");
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) {
-      router.push("/users/search");
-      return;
-    }
-    router.push(`/users/search?q=${encodeURIComponent(q)}`);
-  };
+  const isHome = pathname === "/feed" || pathname === "/";
 
   const handleLogout = () => {
     dispatch(logout());
@@ -35,33 +26,41 @@ export function TimelineHeader() {
     router.push("/feed");
   };
 
+  const goHome = () => {
+    setMenuOpen(false);
+    // Semua post (explore) — refresh jika sudah di /feed
+    if (isHome) {
+      window.dispatchEvent(new Event("sociality:go-home"));
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-black/95 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[470px] items-center gap-3 px-4 md:h-16 md:max-w-6xl md:gap-8">
-        <Link href="/feed" className="shrink-0" onClick={() => setMenuOpen(false)}>
+      {/* Figma 41419-6118: logo kiri · search benar-benar tengah · profil kanan */}
+      <div className="relative mx-auto flex h-14 max-w-[470px] items-center px-4 md:h-16 md:max-w-6xl md:px-6">
+        {/* Kiri — logo → timeline semua post */}
+        <Link
+          href="/feed"
+          className="relative z-10 shrink-0"
+          onClick={goHome}
+        >
           <SocialityLogo
             markClassName="h-5 w-5 md:h-6 md:w-6"
             textClassName="text-base font-bold tracking-tight md:text-xl"
           />
         </Link>
 
-        {/* Desktop search */}
-        <form onSubmit={handleSearch} className="mx-auto hidden w-full max-w-md md:block">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search"
-              className="w-full rounded-xl border border-transparent bg-[#1a1a1a] py-2.5 pl-10 pr-3 text-sm text-white placeholder-neutral-500 outline-none transition focus:border-violet-500/40 focus:bg-[#121212]"
-            />
+        {/* Tengah — search absolut di center (desktop) */}
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-[min(420px,42vw)] -translate-x-1/2 items-center md:flex">
+          <div className="pointer-events-auto w-full">
+            <HeaderSearch />
           </div>
-        </form>
+        </div>
 
-        <div className="ml-auto flex items-center gap-1.5 md:gap-3">
-          {/* Mobile search icon */}
+        {/* Kanan — profil / auth */}
+        <div className="relative z-10 ml-auto flex items-center gap-1.5 md:gap-3">
           <Link
-            href="/users/search"
+            href="/search"
             className="rounded-lg p-2 text-white hover:bg-white/5 md:hidden"
             aria-label="Search"
           >
@@ -70,12 +69,10 @@ export function TimelineHeader() {
 
           {isAuthenticated && user ? (
             <>
-              {/* Mobile: avatar only (Figma after login) */}
               <Link href="/me" className="md:hidden" aria-label="Profile">
                 <Avatar src={user.avatarUrl} name={user.name || user.username} size="sm" />
               </Link>
 
-              {/* Desktop: name + logout */}
               <Link href="/me" className="hidden items-center gap-2.5 hover:opacity-90 md:flex">
                 <Avatar src={user.avatarUrl} name={user.name || user.username} size="sm" />
                 <span className="text-sm font-semibold text-white">
@@ -92,7 +89,6 @@ export function TimelineHeader() {
             </>
           ) : (
             <>
-              {/* Mobile: hamburger — Figma before login */}
               <button
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
@@ -102,7 +98,6 @@ export function TimelineHeader() {
                 {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
 
-              {/* Desktop: Login + Register */}
               <Link
                 href={`/login?returnTo=${returnTo}`}
                 className="hidden rounded-xl border border-white/20 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/5 md:inline-flex"
@@ -120,7 +115,6 @@ export function TimelineHeader() {
         </div>
       </div>
 
-      {/* Mobile guest menu panel — Figma Before Login / Open */}
       {!isAuthenticated && menuOpen && (
         <div className="border-t border-white/10 bg-black px-4 py-3 md:hidden">
           <div className="mx-auto flex max-w-[470px] items-center justify-end gap-3">

@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { setCreatePostModalOpen } from "@/store/uiSlice";
 import { postsApi } from "../api/posts";
 import { queryKeys } from "@/lib/query-keys";
+import { EmojiPicker } from "@/components/common/emoji-picker";
 
 export function CreatePostModal() {
   const dispatch = useAppDispatch();
@@ -19,6 +20,24 @@ export function CreatePostModal() {
   const [caption, setCaption] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertEmoji = (emoji: string) => {
+    const el = captionRef.current;
+    if (!el) {
+      setCaption((prev) => prev + emoji);
+      return;
+    }
+    const start = el.selectionStart ?? caption.length;
+    const end = el.selectionEnd ?? caption.length;
+    const next = caption.slice(0, start) + emoji + caption.slice(end);
+    setCaption(next);
+    requestAnimationFrame(() => {
+      el.focus();
+      const pos = start + emoji.length;
+      el.setSelectionRange(pos, pos);
+    });
+  };
 
   const handleClose = () => {
     dispatch(setCreatePostModalOpen(false));
@@ -128,18 +147,22 @@ export function CreatePostModal() {
             )}
           </div>
 
-          {/* Caption */}
+          {/* Caption + emoji */}
           <div>
-            <label className="block text-xs font-medium text-neutral-300 mb-1">
+            <label className="mb-1 block text-xs font-medium text-neutral-300">
               Caption
             </label>
-            <textarea
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Write a caption..."
-              rows={3}
-              className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-white/30 transition-colors resize-none"
-            />
+            <div className="flex items-end gap-2">
+              <EmojiPicker onSelect={insertEmoji} />
+              <textarea
+                ref={captionRef}
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Write a caption..."
+                rows={3}
+                className="w-full resize-none rounded-xl border border-white/10 bg-black px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 transition-colors focus:border-white/30 focus:outline-none"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-2">
