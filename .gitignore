@@ -11,10 +11,14 @@ README.md
 AGENTS.md
 
 # ========================================================
-# Konfigurasi Khusus AI & Token Efficiency
+# Konfigurasi Khusus AI & Token Efficiency (JANGAN ke GitHub)
 # ========================================================
+.cursor/
+.cursorignore
 .agentignore
 .cursorrules
+.claude/
+.codex/
 
 # ========================================================
 # Node.js & Next.js Standard Ignores

@@ -67,15 +67,15 @@ export function CreatePostModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="glass-panel w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
-          <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-purple-400" />
+      <div className="glass-panel w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <h2 className="text-base font-semibold text-neutral-100 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-neutral-300" />
             Create New Post
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-full text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -97,7 +97,7 @@ export function CreatePostModal() {
           {/* Image Uploader & Preview */}
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="relative border-2 border-dashed border-slate-700 hover:border-purple-500/50 rounded-xl p-4 flex flex-col items-center justify-center min-h-[220px] bg-slate-900/50 cursor-pointer overflow-hidden transition-colors"
+            className="relative border-2 border-dashed border-white/10 hover:border-white/30 rounded-xl p-4 flex flex-col items-center justify-center min-h-[220px] bg-black/40 cursor-pointer overflow-hidden transition-colors"
           >
             <input
               type="file"
@@ -116,21 +116,21 @@ export function CreatePostModal() {
                 />
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 text-center text-slate-400">
-                <div className="p-3 rounded-full bg-purple-500/10 text-purple-400">
+              <div className="flex flex-col items-center gap-2 text-center text-neutral-400">
+                <div className="p-3 rounded-full bg-white/5 text-neutral-300">
                   <Upload className="w-6 h-6" />
                 </div>
-                <p className="text-sm font-medium text-slate-200">
+                <p className="text-sm font-medium text-neutral-200">
                   Click or drag image here
                 </p>
-                <p className="text-xs text-slate-500">JPG, PNG, or WEBP (Max 5MB)</p>
+                <p className="text-xs text-neutral-500">JPG, PNG, or WEBP (Max 5MB)</p>
               </div>
             )}
           </div>
 
           {/* Caption */}
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-neutral-300 mb-1">
               Caption
             </label>
             <textarea
@@ -138,7 +138,7 @@ export function CreatePostModal() {
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Write a caption..."
               rows={3}
-              className="w-full px-3 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+              className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-white/30 transition-colors resize-none"
             />
           </div>
 
@@ -146,14 +146,14 @@ export function CreatePostModal() {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-sm text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm text-neutral-300 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!file || createMutation.isPending}
-              className="px-5 py-2 text-sm font-semibold rounded-xl gradient-primary text-white shadow-md hover:shadow-purple-500/25 disabled:opacity-50 flex items-center gap-2"
+              className="flex items-center gap-2 rounded-xl bg-white px-5 py-2 text-sm font-semibold text-black shadow-md disabled:opacity-50"
             >
               {createMutation.isPending && (
                 <Loader2 className="w-4 h-4 animate-spin" />

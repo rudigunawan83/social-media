@@ -1,5 +1,6 @@
 import apiClient from "@/lib/axios";
 import { User } from "@/types/models";
+import { normalizeUser, unwrapData } from "@/lib/normalize";
 
 export interface RegisterPayload {
   name: string;
@@ -22,18 +23,18 @@ export interface AuthResult {
 }
 
 export const authApi = {
-  register: async (payload: RegisterPayload): Promise<any> => {
+  register: async (payload: RegisterPayload) => {
     const { data } = await apiClient.post("/api/auth/register", payload);
-    return data.data || data;
+    return unwrapData(data);
   },
 
   login: async (payload: LoginPayload): Promise<AuthResult> => {
     const { data } = await apiClient.post("/api/auth/login", payload);
-    // Backend returns { success: true, message: "...", data: { token: "...", user: {...} } }
-    const inner = data.data || data;
+    const inner = unwrapData<any>(data) || data;
+    const userRaw = inner.user || data.user;
     return {
       token: inner.token || data.token,
-      user: inner.user || data.user,
+      user: userRaw ? normalizeUser(userRaw) : undefined,
       message: data.message,
       success: data.success,
     };

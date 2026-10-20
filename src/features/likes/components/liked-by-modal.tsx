@@ -14,48 +14,49 @@ export function LikedByModal() {
   const dispatch = useAppDispatch();
   const postId = useAppSelector((s) => s.ui.likedByPostId);
 
-  const { data: users, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.posts.likes(postId || 0),
-    queryFn: () => (postId ? likesApi.getPostLikes(postId) : Promise.resolve([])),
+    queryFn: () =>
+      postId
+        ? likesApi.getPostLikes(postId)
+        : Promise.resolve({ items: [], page: 1, limit: 20, hasMore: false }),
     enabled: !!postId,
   });
 
   if (!postId) return null;
 
-  const handleClose = () => {
-    dispatch(setLikedByPostId(null));
-  };
+  const users = data?.items || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="glass-panel w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col max-h-[80vh]">
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
-          <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
-            <Heart className="w-4 h-4 fill-red-500 text-red-500" />
-            Liked by
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#121212] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-white/8 p-4">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-white">
+            <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+            Likes
           </h2>
           <button
-            onClick={handleClose}
-            className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            onClick={() => dispatch(setLikedByPostId(null))}
+            className="rounded-full p-1 text-neutral-400 transition-colors hover:bg-white/5 hover:text-white"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="p-4 overflow-y-auto flex-1 flex flex-col gap-3">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
           {isLoading && <LoadingSpinner />}
-          {isError && <ErrorState message="Failed to load likes." onRetry={refetch} />}
-          {!isLoading && !isError && (!users || users.length === 0) && (
-            <EmptyState
-              title="No likes yet"
-              description="Be the first to like this post!"
-            />
+          {isError && <ErrorState message="Gagal memuat likes." onRetry={() => refetch()} />}
+          {!isLoading && !isError && users.length === 0 && (
+            <EmptyState title="Belum ada like" description="Jadilah yang pertama like postingan ini." />
           )}
           {!isLoading &&
             !isError &&
-            users &&
             users.map((user) => (
-              <UserChip key={user.id} user={user} className="p-2 rounded-xl hover:bg-slate-800/40" />
+              <UserChip
+                key={user.id}
+                user={user}
+                className="rounded-xl p-2 hover:bg-white/5"
+              />
             ))}
         </div>
       </div>

@@ -1,5 +1,6 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface AvatarProps {
@@ -17,8 +18,26 @@ const sizeClasses = {
   xl: "w-20 h-20 text-xl",
 };
 
+function isUsableImageSrc(src?: string | null): src is string {
+  if (!src || typeof src !== "string") return false;
+  const value = src.trim();
+  if (!value) return false;
+  return (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("blob:") ||
+    value.startsWith("data:") ||
+    value.startsWith("/")
+  );
+}
+
 export function Avatar({ src, alt = "Avatar", name = "", size = "md", className }: AvatarProps) {
   const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
   const initials = name
     ? name
         .split(" ")
@@ -28,23 +47,23 @@ export function Avatar({ src, alt = "Avatar", name = "", size = "md", className 
         .toUpperCase()
     : "U";
 
-  const showFallback = !src || imageError;
+  const showFallback = !isUsableImageSrc(src) || imageError;
 
   return (
     <div
       className={cn(
-        "relative rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center font-semibold bg-gradient-to-tr from-purple-700 via-indigo-600 to-violet-500 text-white shadow-inner",
+        "relative flex flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-800 font-semibold text-neutral-100 ring-1 ring-white/10",
         sizeClasses[size],
         className
       )}
     >
       {!showFallback ? (
-        <Image
-          src={src!}
+        // Native img: avatar URL dari BE/Cloudinary sering dinamis & tidak selalu cocok next/image optimizer
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
           alt={alt}
-          fill
-          sizes="(max-width: 768px) 50px, 80px"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           onError={() => setImageError(true)}
         />
       ) : (

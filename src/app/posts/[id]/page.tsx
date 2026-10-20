@@ -51,117 +51,108 @@ export default function PostDetailPage({
     },
   });
 
-  const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this post?")) {
-      deleteMutation.mutate();
-    }
-  };
-
   return (
-    <MainLayout>
+    <MainLayout wide>
       <div className="mb-4">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
+          className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-neutral-400 transition-colors hover:text-white"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           Back
         </button>
       </div>
 
       {isLoading && <LoadingSpinner />}
-      {isError && (
-        <ErrorState message="Could not find this post." onRetry={refetch} />
-      )}
+      {isError && <ErrorState message="Post tidak ditemukan." onRetry={() => refetch()} />}
 
       {post && (
-        <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl border border-slate-700/80 mb-6">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <Link href={`/profile/${post.author?.username || ""}`}>
-                <Avatar
-                  src={post.author?.avatarUrl}
-                  name={post.author?.name || post.author?.username}
-                  size="md"
-                />
-              </Link>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/profile/${post.author?.username || ""}`}
-                    className="font-semibold text-sm text-slate-100 hover:text-purple-400 transition-colors"
-                  >
-                    {post.author?.name || post.author?.username}
-                  </Link>
-                  <span className="text-xs text-slate-500">•</span>
-                  <span className="text-xs text-slate-400">
-                    {formatRelativeTime(post.createdAt)}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400">@{post.author?.username}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {post.author?.username && (
-                <FollowButton
-                  username={post.author.username}
-                  initialIsFollowing={post.author.isFollowedByMe}
-                  size="sm"
-                />
-              )}
-              {isOwner && (
-                <button
-                  onClick={handleDelete}
-                  disabled={deleteMutation.isPending}
-                  title="Delete post"
-                  className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Full Image */}
-          {post.imageUrl && (
-            <div className="relative aspect-square md:aspect-4/3 w-full bg-slate-950 overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-white/8 bg-[#121212] md:grid md:grid-cols-[1.2fr_0.9fr]">
+          <div className="relative aspect-square w-full bg-black md:aspect-auto md:min-h-[520px]">
+            {post.imageUrl ? (
               <Image
                 src={post.imageUrl}
                 alt={post.caption || "Post Image"}
                 fill
                 priority
-                sizes="(max-width: 768px) 100vw, 700px"
+                sizes="(max-width: 768px) 100vw, 60vw"
                 className="object-contain"
               />
-            </div>
-          )}
-
-          {/* Post Action Bar & Caption */}
-          <div className="p-5 border-b border-slate-800">
-            <div className="flex items-center justify-between mb-3">
-              <LikeButton
-                postId={post.id}
-                initialIsLiked={post.isLikedByMe}
-                initialLikesCount={post.likesCount || 0}
-              />
-              <SaveButton postId={post.id} initialIsSaved={post.isSavedByMe} />
-            </div>
-
-            {post.caption && (
-              <p className="text-sm text-slate-200 leading-relaxed">
-                <span className="font-semibold text-slate-100 mr-2">
-                  {post.author?.username}
-                </span>
-                {post.caption}
-              </p>
+            ) : (
+              <div className="flex h-full min-h-[280px] items-center justify-center text-sm text-neutral-600">
+                No image
+              </div>
             )}
           </div>
 
-          {/* Comments Section */}
-          <div className="p-5">
-            <CommentBox postId={post.id} postAuthorId={post.authorId} />
+          <div className="flex max-h-[80vh] flex-col border-t border-white/8 md:max-h-none md:border-t-0 md:border-l">
+            <div className="flex items-center justify-between border-b border-white/8 p-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <Link href={`/profile/${post.author?.username || ""}`}>
+                  <Avatar
+                    src={post.author?.avatarUrl}
+                    name={post.author?.name || post.author?.username}
+                    size="md"
+                  />
+                </Link>
+                <div className="min-w-0">
+                  <Link
+                    href={`/profile/${post.author?.username || ""}`}
+                    className="block truncate text-sm font-semibold text-white hover:opacity-80"
+                  >
+                    {post.author?.name || post.author?.username}
+                  </Link>
+                  <p className="text-xs text-neutral-500">
+                    @{post.author?.username} · {formatRelativeTime(post.createdAt)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {post.author?.username && (
+                  <FollowButton
+                    username={post.author.username}
+                    initialIsFollowing={post.author.isFollowedByMe}
+                    size="sm"
+                  />
+                )}
+                {isOwner && (
+                  <button
+                    onClick={() => {
+                      if (confirm("Hapus postingan ini?")) deleteMutation.mutate();
+                    }}
+                    disabled={deleteMutation.isPending}
+                    title="Delete post"
+                    className="rounded-full p-1.5 text-neutral-500 hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="border-b border-white/8 px-4 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <LikeButton
+                  postId={post.id}
+                  initialIsLiked={post.isLikedByMe}
+                  initialLikesCount={post.likesCount || 0}
+                />
+                <SaveButton postId={post.id} initialIsSaved={post.isSavedByMe} />
+              </div>
+              {post.caption && (
+                <p className="text-sm leading-relaxed text-neutral-200">
+                  <span className="mr-2 font-semibold text-white">
+                    {post.author?.username}
+                  </span>
+                  {post.caption}
+                </p>
+              )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              <CommentBox postId={post.id} postAuthorId={post.authorId} />
+            </div>
           </div>
         </div>
       )}

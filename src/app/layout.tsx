@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const sans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
-  title: "Sociality — Connect, Share & Explore",
-  description: "A sleek, modern social media platform built with Next.js and TypeScript.",
+  title: "Sociality",
+  description: "Connect, share, and explore — Sociality MVP",
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -16,8 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} min-h-screen bg-[#0b0f19] text-[#f8fafc] antialiased selection:bg-purple-600 selection:text-white`}>
+    <html lang="id" className="dark" suppressHydrationWarning>
+      <body
+        className={`${sans.className} min-h-screen bg-black text-neutral-100 antialiased selection:bg-white selection:text-black`}
+        suppressHydrationWarning
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

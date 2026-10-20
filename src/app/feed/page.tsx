@@ -3,106 +3,127 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { MainLayout } from "@/components/layout/main-layout";
+import { Compass, PlusCircle } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { TimelineLayout } from "@/components/layout/timeline-layout";
 import { PostCard } from "@/features/posts/components/post-card";
 import { LoadingSpinner, EmptyState, ErrorState } from "@/components/common/state-views";
+import { LoadMoreButton } from "@/components/common/load-more-button";
 import { postsApi } from "@/features/posts/api/posts";
 import { queryKeys } from "@/lib/query-keys";
 import { useAppSelector } from "@/store";
-import { Sparkles, Compass, PlusCircle } from "lucide-react";
-import { useDispatch } from "react-redux";
 import { setCreatePostModalOpen } from "@/store/uiSlice";
+import { Post } from "@/types/models";
 
 export default function FeedPage() {
   const dispatch = useDispatch();
   const { isAuthenticated, isLoading: authLoading } = useAppSelector((s) => s.auth);
   const [page, setPage] = useState(1);
+  const [posts, setPosts] = useState<Post[]>([]);
 
-  const {
-    data: posts,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: queryKeys.feed.list(page),
-    queryFn: () => postsApi.getFeed(page, 20),
-    enabled: isAuthenticated,
+  // Sebelum login: /api/posts (explore publik)
+  // Sesudah login: /api/feed (timeline pribadi)
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
+    queryKey: isAuthenticated
+      ? queryKeys.feed.list(page)
+      : queryKeys.posts.explore(page),
+    queryFn: async () => {
+      const result = isAuthenticated
+        ? await postsApi.getFeed(page, 20)
+        : await postsApi.getExplorePosts(page, 20);
+      setPosts((prev) => {
+        if (page === 1) return result.items;
+        const ids = new Set(prev.map((p) => p.id));
+        return [...prev, ...result.items.filter((p) => !ids.has(p.id))];
+      });
+      return result;
+    },
+    enabled: !authLoading,
   });
 
+  // Reset list saat status auth berubah
+  React.useEffect(() => {
+    setPage(1);
+    setPosts([]);
+  }, [isAuthenticated]);
+
+  const list = posts.length > 0 ? posts : data?.items || [];
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
-    <MainLayout>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-400" />
-            Home Feed
-          </h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Posts from people you follow & your recent activity
-          </p>
-        </div>
+    <TimelineLayout>
+      {/* Judul Timeline hanya desktop — mobile Figma langsung feed */}
+      <div className="mb-4 hidden border-b border-white/10 pb-3 md:block">
+        <h1 className="text-base font-semibold tracking-wide text-white">Timeline</h1>
       </div>
 
-      {!authLoading && !isAuthenticated && (
+      {isLoading && page === 1 && <LoadingSpinner />}
+      {isError && (
+        <ErrorState message="Gagal memuat timeline." onRetry={() => refetch()} />
+      )}
+
+      {!isLoading && !isError && list.length === 0 && (
         <EmptyState
-          title="Sign in to view your feed"
-          description="Follow other creators to see their photos and updates in your personal timeline."
+          title={isAuthenticated ? "Timeline masih kosong" : "Belum ada postingan"}
+          description={
+            isAuthenticated
+              ? "Follow orang lain atau buat postingan pertama Anda."
+              : "Belum ada post publik. Coba lagi nanti atau daftar untuk mulai berbagi."
+          }
           action={
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl gradient-primary text-xs font-semibold text-white shadow"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/explore"
-                className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-200 hover:bg-slate-700"
-              >
-                Explore Public Posts
-              </Link>
-            </div>
+            isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/users/search"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500"
+                >
+                  <Compass className="h-3.5 w-3.5" />
+                  Find People
+                </Link>
+                <button
+                  onClick={() => dispatch(setCreatePostModalOpen(true))}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 px-4 py-2 text-xs font-semibold text-neutral-200"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  Create Post
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login?returnTo=/feed"
+                  className="rounded-xl border border-white/20 px-4 py-2 text-xs font-semibold text-white"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white"
+                >
+                  Register
+                </Link>
+              </div>
+            )
           }
         />
       )}
 
-      {isAuthenticated && (
-        <>
-          {isLoading && <LoadingSpinner />}
-          {isError && (
-            <ErrorState message="Could not load your feed." onRetry={refetch} />
-          )}
-          {!isLoading && !isError && (!posts || posts.length === 0) && (
-            <EmptyState
-              title="Your feed is empty"
-              description="You haven't followed anyone yet, or they haven't posted anything."
-              action={
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/users/search"
-                    className="px-4 py-2 rounded-xl gradient-primary text-xs font-semibold text-white shadow flex items-center gap-1.5"
-                  >
-                    <Compass className="w-3.5 h-3.5" />
-                    Find People
-                  </Link>
-                  <button
-                    onClick={() => dispatch(setCreatePostModalOpen(true))}
-                    className="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-200 hover:bg-slate-700 flex items-center gap-1.5"
-                  >
-                    <PlusCircle className="w-3.5 h-3.5" />
-                    Create Post
-                  </button>
-                </div>
-              }
-            />
-          )}
+      {list.map((post) => (
+        <PostCard key={post.id} post={post} />
+      ))}
 
-          {!isLoading &&
-            !isError &&
-            posts &&
-            posts.map((post) => <PostCard key={post.id} post={post} />)}
-        </>
-      )}
-    </MainLayout>
+      <LoadMoreButton
+        hasMore={data?.hasMore}
+        isLoading={isFetching && page > 1}
+        onClick={() => setPage((p) => p + 1)}
+      />
+    </TimelineLayout>
   );
 }

@@ -19,7 +19,14 @@ export interface PaginatedResult<T> {
   limit: number;
   total?: number;
   totalPages?: number;
-  hasMore?: boolean;
+  hasMore: boolean;
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
+    hasMore?: boolean;
+  };
 }
 
 export interface LoginResponse {

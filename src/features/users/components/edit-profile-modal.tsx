@@ -83,15 +83,15 @@ export function EditProfileModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="glass-panel w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
-          <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">
-            <UserIcon className="w-5 h-5 text-purple-400" />
+      <div className="glass-panel w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
+          <h2 className="text-base font-semibold text-neutral-100 flex items-center gap-2">
+            <UserIcon className="w-5 h-5 text-neutral-300" />
             Edit Profile
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-full text-neutral-400 hover:text-white hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -117,7 +117,7 @@ export function EditProfileModal() {
                 src={avatarPreview}
                 name={name || username}
                 size="xl"
-                className="ring-2 ring-purple-500/30"
+                className="ring-2 ring-white/15"
               />
               <button
                 type="button"
@@ -136,15 +136,15 @@ export function EditProfileModal() {
               className="hidden"
             />
             <div>
-              <p className="text-sm font-medium text-slate-200">Profile Photo</p>
-              <p className="text-xs text-slate-400">JPG, PNG, or WEBP (max 5MB)</p>
+              <p className="text-sm font-medium text-neutral-200">Profile Photo</p>
+              <p className="text-xs text-neutral-400">JPG, PNG, or WEBP (max 5MB)</p>
             </div>
           </div>
 
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-neutral-300 mb-1">
                 Display Name
               </label>
               <input
@@ -152,11 +152,11 @@ export function EditProfileModal() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 focus:outline-none focus:border-white/30"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-neutral-300 mb-1">
                 Username
               </label>
               <input
@@ -164,13 +164,13 @@ export function EditProfileModal() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 focus:outline-none focus:border-white/30"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-neutral-300 mb-1">
               Phone Number (Optional)
             </label>
             <input
@@ -178,12 +178,12 @@ export function EditProfileModal() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="e.g. 08123456789"
-              className="w-full px-3 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 focus:outline-none focus:border-white/30"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-neutral-300 mb-1">
               Bio
             </label>
             <textarea
@@ -191,7 +191,7 @@ export function EditProfileModal() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="Tell us about yourself..."
               rows={2}
-              className="w-full px-3 py-2 text-sm rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 focus:outline-none focus:border-purple-500 resize-none"
+              className="w-full px-3 py-2 text-sm rounded-xl bg-black border border-white/10 text-neutral-100 focus:outline-none focus:border-white/30 resize-none"
             />
           </div>
 
@@ -199,14 +199,14 @@ export function EditProfileModal() {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-sm text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 text-sm text-neutral-300 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={updateMutation.isPending}
-              className="px-5 py-2 text-sm font-semibold rounded-xl gradient-primary text-white shadow-md hover:shadow-purple-500/25 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-sm font-semibold rounded-xl gradient-primary text-white shadow-md  disabled:opacity-50 flex items-center gap-2"
             >
               {updateMutation.isPending && (
                 <Loader2 className="w-4 h-4 animate-spin" />

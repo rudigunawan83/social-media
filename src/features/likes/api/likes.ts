@@ -1,5 +1,7 @@
 import apiClient from "@/lib/axios";
 import { User, Post } from "@/types/models";
+import { PaginatedResult } from "@/types/api";
+import { toPaginatedPosts, toPaginatedUsers } from "@/lib/normalize";
 
 export const likesApi = {
   likePost: async (id: number): Promise<{ success: boolean }> => {
@@ -12,15 +14,13 @@ export const likesApi = {
     return data;
   },
 
-  getPostLikes: async (id: number, page = 1, limit = 20): Promise<User[]> => {
+  getPostLikes: async (id: number, page = 1, limit = 20): Promise<PaginatedResult<User>> => {
     const { data } = await apiClient.get(`/api/posts/${id}/likes`, { params: { page, limit } });
-    const list = data.data || data.items || data;
-    return Array.isArray(list) ? list : [];
+    return toPaginatedUsers(data);
   },
 
-  getMyLikes: async (page = 1, limit = 20): Promise<Post[]> => {
+  getMyLikes: async (page = 1, limit = 20): Promise<PaginatedResult<Post>> => {
     const { data } = await apiClient.get("/api/me/likes", { params: { page, limit } });
-    const list = data.data || data.items || data;
-    return Array.isArray(list) ? list : [];
+    return toPaginatedPosts(data);
   },
 };

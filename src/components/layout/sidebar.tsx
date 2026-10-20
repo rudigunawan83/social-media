@@ -11,12 +11,12 @@ import {
   User as UserIcon,
   PlusSquare,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setCreatePostModalOpen } from "@/store/uiSlice";
 import { logout } from "@/store/authSlice";
 import { Avatar } from "@/components/common/avatar";
+import { SocialityLogo } from "@/components/common/sociality-logo";
 import { cn } from "@/lib/utils";
 
 export function Sidebar() {
@@ -47,95 +47,83 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 border-r border-slate-800 bg-[#0b0f19]/90 backdrop-blur-md p-4 justify-between z-30">
+    <aside className="sticky top-0 z-30 hidden h-screen w-64 flex-col justify-between border-r border-white/8 bg-black p-4 md:flex">
       <div>
-        {/* Brand Logo */}
-        <Link href="/feed" className="flex items-center gap-3 px-3 py-4 mb-4 group">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center text-white shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-white via-slate-100 to-purple-300 bg-clip-text text-transparent">
-              Sociality
-            </h1>
-            <p className="text-[10px] text-purple-400 font-medium tracking-wider uppercase">
-              MVP Frontend
-            </p>
-          </div>
+        <Link href="/feed" className="mb-6 flex items-center px-3 py-3">
+          <SocialityLogo
+            markClassName="h-7 w-7"
+            textClassName="text-xl font-semibold tracking-tight"
+          />
         </Link>
 
-        {/* Navigation Items */}
-        <nav className="flex flex-col gap-1.5">
+        <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
             if (item.requiresAuth && !isAuthenticated) return null;
             const Icon = item.icon;
+            const base = item.href.split("?")[0];
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/feed" && pathname.startsWith(item.href));
+              pathname === base ||
+              (base !== "/feed" && pathname.startsWith(base) && base !== "/me") ||
+              (base === "/me" && pathname.startsWith("/me"));
 
             return (
               <Link
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
+                  "flex items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-colors",
                   isActive
-                    ? "bg-purple-600/15 text-purple-300 border border-purple-500/20"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
+                    ? "bg-white/10 text-white"
+                    : "text-neutral-400 hover:bg-white/5 hover:text-white"
                 )}
               >
-                <Icon className={cn("w-5 h-5", isActive ? "text-purple-400" : "")} />
+                <Icon className="h-5 w-5" />
                 <span>{item.label}</span>
               </Link>
             );
           })}
 
-          {/* Create Post Button */}
           <button
             onClick={handleCreatePost}
-            className="mt-4 w-full py-3 px-4 rounded-xl gradient-primary font-semibold text-sm text-white shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-neutral-200 active:scale-[0.98]"
           >
-            <PlusSquare className="w-5 h-5" />
+            <PlusSquare className="h-5 w-5" />
             <span>Create Post</span>
           </button>
         </nav>
       </div>
 
-      {/* User Session Footer */}
-      <div className="pt-4 border-t border-slate-800/80">
+      <div className="border-t border-white/8 pt-4">
         {isAuthenticated && user ? (
-          <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800">
-            <Link
-              href="/me"
-              className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-80 transition-opacity"
-            >
+          <div className="flex items-center justify-between rounded-xl border border-white/8 bg-[#121212] p-2">
+            <Link href="/me" className="flex min-w-0 flex-1 items-center gap-2.5 hover:opacity-80">
               <Avatar src={user.avatarUrl} name={user.name || user.username} size="sm" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-200 truncate">
+                <p className="truncate text-xs font-semibold text-neutral-100">
                   {user.name || user.username}
                 </p>
-                <p className="text-[10px] text-slate-500 truncate">@{user.username}</p>
+                <p className="truncate text-[10px] text-neutral-500">@{user.username}</p>
               </div>
             </Link>
             <button
               onClick={handleLogout}
               title="Logout"
-              className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+              className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="h-4 w-4" />
             </button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             <Link
               href="/login"
-              className="w-full py-2 px-3 text-center rounded-xl bg-slate-800 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition-colors"
+              className="w-full rounded-xl bg-white/10 py-2 text-center text-xs font-semibold text-white hover:bg-white/15"
             >
               Log In
             </Link>
             <Link
               href="/register"
-              className="w-full py-2 px-3 text-center rounded-xl gradient-primary text-xs font-semibold text-white shadow hover:opacity-90 transition-opacity"
+              className="w-full rounded-xl bg-white py-2 text-center text-xs font-semibold text-black hover:bg-neutral-200"
             >
               Register
             </Link>

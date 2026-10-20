@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { authApi } from "../api/auth";
+import { SocialityLogo } from "@/components/common/sociality-logo";
 import { cn } from "@/lib/utils";
 
 const registerSchema = z
@@ -86,14 +87,11 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-[420px] mx-auto p-6 md:p-8 rounded-2xl bg-[#121827]/95 border border-slate-800 shadow-2xl backdrop-blur-md">
+    <div className="w-full max-w-[420px] mx-auto p-6 md:p-8 rounded-2xl bg-[#121212] border border-white/10 shadow-2xl backdrop-blur-md">
       {/* Header: Logo + Title */}
       <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-lg font-bold text-white tracking-wide">Sociality</span>
+        <div className="mb-2 flex justify-center">
+          <SocialityLogo markClassName="h-6 w-6" textClassName="text-lg font-bold" />
         </div>
         <h1 className="text-xl font-bold text-white">Register</h1>
       </div>
@@ -107,16 +105,16 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
         {/* Name */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Name</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Name</label>
           <input
             type="text"
             {...register("name")}
             placeholder="Enter your name"
             className={cn(
-              "w-full px-3.5 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+              "w-full px-3.5 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
               errors.name
                 ? "border-red-500 focus:border-red-500"
-                : "border-slate-800 focus:border-purple-500"
+                : "border-white/10 focus:border-white/30"
             )}
           />
           {errors.name && (
@@ -126,16 +124,16 @@ export function RegisterForm() {
 
         {/* Username */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Username</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Username</label>
           <input
             type="text"
             {...register("username")}
             placeholder="Enter your username"
             className={cn(
-              "w-full px-3.5 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+              "w-full px-3.5 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
               errors.username
                 ? "border-red-500 focus:border-red-500"
-                : "border-slate-800 focus:border-purple-500"
+                : "border-white/10 focus:border-white/30"
             )}
           />
           {errors.username && (
@@ -145,16 +143,16 @@ export function RegisterForm() {
 
         {/* Email */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Email</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Email</label>
           <input
             type="email"
             {...register("email")}
             placeholder="Enter your email"
             className={cn(
-              "w-full px-3.5 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+              "w-full px-3.5 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
               errors.email
                 ? "border-red-500 focus:border-red-500"
-                : "border-slate-800 focus:border-purple-500"
+                : "border-white/10 focus:border-white/30"
             )}
           />
           {errors.email && (
@@ -164,16 +162,16 @@ export function RegisterForm() {
 
         {/* Number Phone */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Number Phone</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Number Phone</label>
           <input
             type="text"
             {...register("phone")}
             placeholder="Enter your number phone"
             className={cn(
-              "w-full px-3.5 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+              "w-full px-3.5 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
               errors.phone
                 ? "border-red-500 focus:border-red-500"
-                : "border-slate-800 focus:border-purple-500"
+                : "border-white/10 focus:border-white/30"
             )}
           />
           {errors.phone && (
@@ -183,23 +181,23 @@ export function RegisterForm() {
 
         {/* Password */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Password</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Password</label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               {...register("password")}
               placeholder="Enter your password"
               className={cn(
-                "w-full pl-3.5 pr-10 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+                "w-full pl-3.5 pr-10 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
                 errors.password
                   ? "border-red-500 focus:border-red-500"
-                  : "border-slate-800 focus:border-purple-500"
+                  : "border-white/10 focus:border-white/30"
               )}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors p-1 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 transition-colors p-1 cursor-pointer"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -211,23 +209,23 @@ export function RegisterForm() {
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Confirm Password</label>
+          <label className="block text-xs font-medium text-neutral-300 mb-1">Confirm Password</label>
           <div className="relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
               {...register("confirmPassword")}
               placeholder="Enter your confirm password"
               className={cn(
-                "w-full pl-3.5 pr-10 py-2.5 bg-[#0f172a] rounded-xl text-xs text-slate-100 placeholder-slate-500 border transition-colors focus:outline-none",
+                "w-full pl-3.5 pr-10 py-2.5 bg-black rounded-xl text-xs text-neutral-100 placeholder-neutral-500 border transition-colors focus:outline-none",
                 errors.confirmPassword
                   ? "border-red-500 focus:border-red-500"
-                  : "border-slate-800 focus:border-purple-500"
+                  : "border-white/10 focus:border-white/30"
               )}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors p-1 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 transition-colors p-1 cursor-pointer"
             >
               {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -242,7 +240,7 @@ export function RegisterForm() {
           type="submit"
           id="submit-register-btn"
           disabled={isLoading}
-          className="w-full mt-3 py-2.5 rounded-xl bg-[#7c3aed] hover:bg-[#6d28d9] font-semibold text-xs text-white shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 active:scale-[0.99] disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full mt-3 py-2.5 rounded-xl bg-white hover:bg-neutral-200 font-semibold text-xs text-black active:scale-[0.99] disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
           <span>Submit</span>
@@ -250,9 +248,9 @@ export function RegisterForm() {
       </form>
 
       {/* Footer */}
-      <div className="mt-5 text-center text-xs text-slate-400">
+      <div className="mt-5 text-center text-xs text-neutral-400">
         Already have an account?{" "}
-        <Link href="/login" className="text-purple-400 font-semibold hover:underline">
+        <Link href="/login" className="text-neutral-300 font-semibold hover:underline">
           Log in
         </Link>
       </div>

@@ -1,5 +1,7 @@
 import apiClient from "@/lib/axios";
 import { Post } from "@/types/models";
+import { PaginatedResult } from "@/types/api";
+import { toPaginatedPosts } from "@/lib/normalize";
 
 export const bookmarksApi = {
   savePost: async (id: number): Promise<{ success: boolean }> => {
@@ -12,9 +14,8 @@ export const bookmarksApi = {
     return data;
   },
 
-  getMySaved: async (page = 1, limit = 20): Promise<Post[]> => {
+  getMySaved: async (page = 1, limit = 20): Promise<PaginatedResult<Post>> => {
     const { data } = await apiClient.get("/api/me/saved", { params: { page, limit } });
-    const list = data.data || data.items || data;
-    return Array.isArray(list) ? list : [];
+    return toPaginatedPosts(data);
   },
 };

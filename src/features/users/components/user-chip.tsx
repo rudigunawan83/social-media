@@ -22,10 +22,10 @@ export function UserChip({ user, showFollowButton = true, className }: UserChipP
       >
         <Avatar src={user.avatarUrl} name={user.name || user.username} size="md" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-slate-100 truncate group-hover:text-purple-400 transition-colors">
+          <p className="text-sm font-semibold text-neutral-100 truncate group-hover:text-neutral-300 transition-colors">
             {user.name || user.username}
           </p>
-          <p className="text-xs text-slate-400 truncate">@{user.username}</p>
+          <p className="text-xs text-neutral-400 truncate">@{user.username}</p>
         </div>
       </Link>
       {showFollowButton && (
